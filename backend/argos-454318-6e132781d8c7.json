@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "argos-454318",
+  "private_key_id": "6e132781d8c7dd04c3fc321b7a6551260b3c2ad4",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCMg26rYH3oUegK\nB2vaRz37KD8VuRuqEjlCf8OGqAH9WaGRkoltUNbMeaxjWbkunv0XGLvomoZGkOAt\n1laNQv1lrPuiw1Rbdd1mB/rMvdrEZe9db7jHHG2doyrIjASvEaNOts05p5h79NKv\nqEbRl2j9tol/ZoGO53UKKsDZWYpJTOjJjUcyCj0Altr1GCpGlHAPk4tFANZSjXKR\no1Jj4S7ehCF94OafzsCITfgIgT0m+i/aEDDHpOK5OywI7tWod3f784jqmxNXI51O\nn5+46y0CuYWEg/zoV2TarzVO5j9MdpsydHHF3H77HMCyC7V94NyoD8zH1hp7jEtX\n1LaxyUAzAgMBAAECggEAAVeYDQcE7N0rbD0Z6KHZk7aUs65q9zrpVRtHUNf1/OeI\nRY2yxlqJUrau0NwgirN2E2xnDxe6xJ3JpmZvuTW0me4HEUzwV1dO4BSfbqk5l7qp\niKjyiORan7DZTcUYnlt6xdu1JiHVsQlrocXnt0TM+e9ubMsb3bOUSJ6T7P+P9JdF\n2lTD+t4Hme+oC+wneHmS/KWar853mU5fmwOmU4JWqDoUs6aogaKM0k6lmfpTPs2P\nwPVcBbFlgOkk6hV05iwdoCGcnvOwykjW5dP4lM58CjjKPTO4PIXbpwb4xheuFNZl\nrKKm4fVVJiNkKnO/efWGzfwL+9A50gOwg4SczIIJ8QKBgQDABmjktQo2PNQyZWi4\nU155qRE6fmwsk9mfPt1px9w3SX5el42n5HoH21GzgysZQqqLkXDx6Pa2kKXTnObn\n2JrIohHFtFrnwRf3EfTgjUlzqfjz46J9y4q0Gm2UqkGqu+Yu/dDSTBNMsnHYl7Do\nisiYag8F+4U9DGiKo73XPsZrdQKBgQC7U6fwIjXQzD4qxzhH+vZjFu6MuQXGdr1E\ncVbx80MPEdurSl6hk6PexBqRJaxWI8bTgjyylH1tdtYHxDYllI8RZaTuVGKgjgSf\na7/YNQK09+bSPsAxUEnBkJA5+LM7M/JcPlIH6pEggbL2EjYGUmC/IDXz1tzfyiBD\n4+Jl8XEQBwKBgQCrGUr/dly6BStiGD/d9dL5fm6uexUyBy9imGY7Ke0Lij3CVTHQ\nRmGBfKdo11hgsqk5oQdNVbH27B4F1wlbzgHlAZvqWJCjbcdHy8UxDFNFb083KT6Q\n7fsSDXZUf/vxAGnStzAJIeYUce/E+SyVl4uzWtU2FG4c/mBsIAg4sWOlPQKBgH4p\nR0+ZGrl29N+GsMb5pHrz9NFdwx/41FuGIdJtzVoW4uUn/ze+4XykgmgDAWA6VCwa\n6Jo1G4xfnqI4aWdB+GD1HfFNb+dF/qMHxHruqNYMp64tiO8tbZ8pp5kDgGJ9B9tM\nNZ8TQY6tC0Ri23PCg1n1baC9sqAd10Eh91ZFF6p9AoGANDwpOXZDFBalMsB3xFN3\nDhHA5RmD8EFwdkLSIYtNTU+RlMUKWs15OMAN3IuSYEVGRMH/QNL1we3VG6NXYzGf\ndmlOfJ5ZfFC6sbGTt1veWGtb/LDy6F4j4dfEEIeJ7rqD81OkAmMgcUqZUTY0pUyO\n0Imdw8j12MyJTnpsaWVQDWU=\n-----END PRIVATE KEY-----\n",
+  "client_email": "argos-vertex-76@argos-454318.iam.gserviceaccount.com",
+  "client_id": "102115474917305109112",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/argos-vertex-76%40argos-454318.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

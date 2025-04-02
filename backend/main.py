@@ -1,72 +1,76 @@
-import os
-import base64
-import json
-import asyncio
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
-from google.cloud import aiplatform
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+import os
+import requests
+import vertexai
+from vertexai.language_models import ChatModel
+from google.oauth2 import service_account
 
 app = FastAPI()
 
-# Enable CORS
+# Enable CORS (restrict this later in production)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # Change this to your frontend domain in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Vertex AI credentials setup on startup
-@app.on_event("startup")
-async def startup_event():
-    if os.environ.get('GOOGLE_SERVICE_ACCOUNT_KEY'):
-        key_content = base64.b64decode(os.environ.get('GOOGLE_SERVICE_ACCOUNT_KEY')).decode('utf-8')
-        key_path = '/app/service-account-key.json'
-        with open(key_path, 'w') as f:
-            f.write(key_content)
-        os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = key_path
-        print(f"Service account credentials configured at {key_path}")
-    else:
-        print("WARNING: No GOOGLE_SERVICE_ACCOUNT_KEY found in environment")
+# Request model for the incoming prompt
+class PromptRequest(BaseModel):
+    prompt: str
 
-# Streaming response endpoint
-@app.post("/copilot/stream")
-async def stream_copilot_response(request: Request):
-    request_data = await request.json()
-    user_message = request_data.get("message", "")
+# Health check endpoint
+@app.get("/health")
+def health():
+    return {"status": "ARGOS backend is live ✅"}
 
-    async def generate():
-        try:
-            aiplatform.init(project="argos-454318")
-            parameters = {
-                "temperature": 0.7,
-                "max_output_tokens": 1024,
-                "top_p": 0.8,
-                "top_k": 40
-            }
-            model = aiplatform.ChatModel.from_pretrained("chat-bison@002")
-            chat = model.start_chat()
-            response = await asyncio.to_thread(chat.send_message, user_message, **parameters)
-            full_text = response.text
-            chunks = []
-            current_chunk = ""
-            for char in full_text:
-                current_chunk += char
-                if char in ['.', '!', '?'] or len(current_chunk) > 80:
-                    if current_chunk.strip():
-                        chunks.append(current_chunk)
-                    current_chunk = ""
-            if current_chunk.strip():
-                chunks.append(current_chunk)
-            for chunk in chunks:
-                yield f"data: {json.dumps({'chunk': chunk})}\n\n"
-                await asyncio.sleep(0.05)
-            yield "data: [DONE]\n\n"
-        except Exception as e:
-            print(f"Streaming error: {str(e)}")
-            yield f"data: {json.dumps({'error': str(e)})}\n\n"
-            yield "data: [DONE]\n\n"
+# Copilot route using Vertex AI
+@app.post("/copilot")
+def copilot(req: PromptRequest):
+    # Set credentials path, default to /app/credentials.json
+    creds_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "/app/credentials.json")
+    creds = service_account.Credentials.from_service_account_file(creds_path)
+    
+    # Initialize Vertex AI
+    vertexai.init(project="argos-454318", location="us-central1", credentials=creds)
+    
+    # Load the chat model
+    chat_model = ChatModel.from_pretrained("chat-bison@002")
+    chat = chat_model.start_chat()
+    
+    # Send message to Copilot
+    response = chat.send_message(req.prompt)
+    
+    return {"response": response.text}
 
-    return StreamingResponse(generate(), media_type="text/event-stream")
+# Restart the backend service via Fly.io
+@app.post("/restart")
+def restart():
+    try:
+        # Fetch environment variables for Fly.io
+        fly_app = os.getenv("FLY_APP_NAME", "argos-backend-self-builder")
+        machine_id = os.getenv("FLY_MACHINE_ID")
+        fly_token = os.getenv("FLY_API_TOKEN")
+
+        if not machine_id or not fly_token:
+            return JSONResponse(status_code=500, content={"error": "Missing machine ID or token"})
+
+        # Fly.io API request for restarting the machine
+        url = f"https://api.machines.fly.io/v1/apps/{fly_app}/machines/{machine_id}/restart"
+        headers = {
+            "Authorization": f"Bearer {fly_token}",
+            "Content-Type": "application/json"
+        }
+        res = requests.post(url, headers=headers)
+        
+        # Return response from Fly.io restart request
+        return {"status": "restarting", "fly_response": res.json()}
+    
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": str(e)})
+

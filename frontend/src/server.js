@@ -13,7 +13,7 @@ const __dirname = dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Enhanced CORS configuration to handle preflight requests and multiple origins
+// Enhanced CORS configuration
 app.use(cors({
   origin: ['http://localhost:5173', 'http://localhost:5174', 'http://192.168.1.104:5174'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -37,11 +37,7 @@ try {
   console.log('Vertex AI key loaded');
 } catch (err) {
   console.error('Failed to load Vertex AI key:', err);
-  key = {
-    project_id: 'mock-project',
-    private_key: 'mock-key',
-    client_email: 'mock@example.com'
-  };
+  return;
 }
 
 const auth = new GoogleAuth({
@@ -49,63 +45,10 @@ const auth = new GoogleAuth({
   scopes: ['https://www.googleapis.com/auth/cloud-platform']
 });
 
-// In-memory mock data stores
-let templates = [
-  {
-    id: '1',
-    name: 'Image Generation Pipeline',
-    description: 'Generate and process images using AI models',
-    workflow: [
-      {
-        source_tool: 'gpt-4',
-        data: {
-          prompt: 'Generate image description',
-          temperature: 0.7
-        }
-      },
-      {
-        source_tool: 'stable_diffusion',
-        data: {
-          steps: 50,
-          guidance_scale: 7.5
-        }
-      }
-    ],
-    tags: ['ai', 'image-generation', 'automation'],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    createdBy: {
-      id: '1',
-      name: 'Demo User'
-    },
-    workspaceId: '1'
-  }
-];
-
-let adapters = [
-  {
-    id: '1',
-    name: 'rest_api',
-    version: '1.0.0',
-    status: 'active',
-    file_path: 'adapters/rest_api.py',
-    last_updated: new Date().toISOString()
-  }
-];
-
 // Template Routes
-app.get('/api/templates', (req, res) => {
-  res.json({ templates });
-});
-
-app.get('/api/templates/search', (req, res) => {
-  const query = req.query.q?.toString().toLowerCase() || '';
-  const filtered = templates.filter(template =>
-    template.name.toLowerCase().includes(query) ||
-    template.description?.toLowerCase().includes(query) ||
-    template.tags.some(tag => tag.toLowerCase().includes(query))
-  );
-  res.json({ templates: filtered });
+app.get('/api/templates', async (req, res) => {
+  // Replace with actual data fetch logic (e.g., from a database)
+  res.json({ templates: [] }); // Send real data here
 });
 
 app.post('/api/templates', (req, res) => {
@@ -115,54 +58,26 @@ app.post('/api/templates', (req, res) => {
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
-  templates.push(template);
+  // Save the template in your database (replace mock logic here)
   res.status(201).json({ template });
 });
 
-app.put('/api/templates/:id', (req, res) => {
-  const { id } = req.params;
-  const index = templates.findIndex(t => t.id === id);
-  if (index === -1) return res.status(404).json({ error: 'Template not found' });
-  templates[index] = { ...templates[index], ...req.body, updatedAt: new Date().toISOString() };
-  res.json({ template: templates[index] });
-});
-
-app.delete('/api/templates/:id', (req, res) => {
-  const { id } = req.params;
-  templates = templates.filter(t => t.id !== id);
-  res.status(204).send();
-});
-
 // Adapter Routes
-app.get('/api/adapters', (req, res) => {
-  res.json({ adapters });
-});
-
-app.post('/api/adapters/reload', (req, res) => {
-  setTimeout(() => {
-    adapters = adapters.map(adapter => ({
-      ...adapter,
-      last_updated: new Date().toISOString()
-    }));
-    res.json({ success: true, message: 'Adapters reloaded successfully' });
-  }, 1000);
+app.get('/api/adapters', async (req, res) => {
+  // Replace with real data fetch logic
+  res.json({ adapters: [] }); // Send real data here
 });
 
 // Improved Vertex AI Transcode Route
 app.post('/api/transcode', async (req, res) => {
-  console.log('Transcode request received:', req.body);
-  
   const { code, sourceLanguage, targetLanguage } = req.body;
-  
+
   if (!code) {
     console.log('Missing required code parameter');
     return res.status(400).json({ error: 'Code is required' });
   }
 
   try {
-    console.log(`Transcoding from ${sourceLanguage || 'auto'} to ${targetLanguage || 'auto'}`);
-    
-    // Mock transcode function - replace with actual implementation
     let mockOutput;
     if (code.includes('function')) {
       // JavaScript to Python conversion
@@ -185,11 +100,10 @@ app.post('/api/transcode', async (req, res) => {
       // Default fallback
       mockOutput = `// Transcoded code\n${code}`;
     }
-    
+
     // Simulate processing time
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    console.log('Transcode successful');
+
     res.json({
       output: mockOutput,
       metadata: {
@@ -242,5 +156,4 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Health check available at http://localhost:${PORT}/health`);
-  console.log(`CORS enabled for multiple origins including localhost:5173 and localhost:5174`);
 });

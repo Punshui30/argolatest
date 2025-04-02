@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWindowStore } from '../lib/windowStore';
-import { Terminal, Package, Database, Code, GitBranch, Box, FileJson, ScrollText } from 'lucide-react';
-import { Maximize2, Minus, X, Sparkles, Bot, Shield, AlertTriangle, Users } from 'lucide-react';
+import {
+  Terminal, Package, Database, Code, GitBranch, Box, FileJson, ScrollText,
+  Maximize2, Minus, X, Sparkles, Bot, Shield, AlertTriangle, Users
+} from 'lucide-react';
 import { TemplateLibrary } from './TemplateLibrary';
 import { AdapterRegistry } from './AdapterRegistry';
 import { AdaptersManager } from './AdaptersManager';
@@ -17,7 +19,7 @@ import { SystemAlertsPanel } from './SystemAlertsPanel';
 import { AgentTeamDashboard } from './AgentTeamDashboard';
 import CopilotPanel from './CopilotPanel';
 import { cn } from '../lib/utils';
-import { ErrorBoundary } from './ErrorBoundary';
+import ErrorBoundary from './ErrorBoundary'; // ✅ FIXED: use default import
 
 const WINDOW_ICONS = {
   terminal: Terminal,
@@ -55,12 +57,12 @@ interface WindowManagerProps {
 }
 
 function WindowManager({ isInitialized }: WindowManagerProps) {
-  const { 
-    windows, 
-    removeWindow, 
-    minimizeWindow, 
-    maximizeWindow, 
-    restoreWindow, 
+  const {
+    windows,
+    removeWindow,
+    minimizeWindow,
+    maximizeWindow,
+    restoreWindow,
     bringToFront,
     activeWindowId,
     updateWindowPosition,
@@ -97,13 +99,10 @@ function WindowManager({ isInitialized }: WindowManagerProps) {
     };
   }, [windows, applyPhysics]);
 
-  const handleMouseDown = useCallback((
-    event: React.MouseEvent,
-    window: Window
-  ) => {
+  const handleMouseDown = useCallback((event: React.MouseEvent, window: Window) => {
     if (!(event.target instanceof HTMLElement) ||
-        !event.target.closest('.window-header') ||
-        event.target.closest('.window-button')) {
+      !event.target.closest('.window-header') ||
+      event.target.closest('.window-button')) {
       return;
     }
 
@@ -162,7 +161,6 @@ function WindowManager({ isInitialized }: WindowManagerProps) {
   useEffect(() => {
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
-
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
@@ -177,14 +175,13 @@ function WindowManager({ isInitialized }: WindowManagerProps) {
     console.log('WindowManager: minimizing window', id);
     minimizeWindow(id);
   };
-  
+
   const handleMaximize = (id: string) => {
     console.log('WindowManager: maximizing window', id);
     maximizeWindow(id);
   };
-  
+
   const handleRestore = (id: string) => restoreWindow(id);
-  
   const handleClose = (id: string) => {
     console.log('WindowManager: closing window', id);
     removeWindow(id);
@@ -193,15 +190,10 @@ function WindowManager({ isInitialized }: WindowManagerProps) {
   if (!isInitialized) return null;
 
   return (
-    <div 
-      ref={containerRef}
-      className="absolute inset-0 overflow-hidden pointer-events-none z-10"
-    >
+    <div ref={containerRef} className="absolute inset-0 overflow-hidden pointer-events-none z-10">
       <AnimatePresence>
         {windows.map((window) => {
           if (!window.isOpen || window.isMinimized) return null;
-          
-          console.log(`Rendering window: ${window.id}, type: ${window.type}, position: ${JSON.stringify(window.position)}`);
 
           const windowStyle = {
             top: window.isMaximized ? 0 : window.position.y,

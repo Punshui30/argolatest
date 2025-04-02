@@ -48,29 +48,3 @@ def copilot(req: PromptRequest):
     
     return {"response": response.text}
 
-# Restart the backend service via Fly.io
-@app.post("/restart")
-def restart():
-    try:
-        # Fetch environment variables for Fly.io
-        fly_app = os.getenv("FLY_APP_NAME", "argos-backend-self-builder")
-        machine_id = os.getenv("FLY_MACHINE_ID")
-        fly_token = os.getenv("FLY_API_TOKEN")
-
-        if not machine_id or not fly_token:
-            return JSONResponse(status_code=500, content={"error": "Missing machine ID or token"})
-
-        # Fly.io API request for restarting the machine
-        url = f"https://api.machines.fly.io/v1/apps/{fly_app}/machines/{machine_id}/restart"
-        headers = {
-            "Authorization": f"Bearer {fly_token}",
-            "Content-Type": "application/json"
-        }
-        res = requests.post(url, headers=headers)
-        
-        # Return response from Fly.io restart request
-        return {"status": "restarting", "fly_response": res.json()}
-    
-    except Exception as e:
-        return JSONResponse(status_code=500, content={"error": str(e)})
-
